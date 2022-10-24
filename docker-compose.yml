@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4576:4576"
+    environment:
+      - SERVICES=sqs
+    command: >
+      "
+        echo 'Waiting SQS start ...'
+        sleep 10
+        echo 'Executing SQS - Creating default queues'
+        aws sqs create-queue --endpoint-url=http://localhost:4576 --queue-name itau-account-transaction-queue;
+        aws --endpoint-url=http://localhost:4576 sqs list-queues;
+      "
+    networks:
+      - bubble
+
+  mongodb_container:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - bubble
+
+volumes:
+  mongodb_data_container:
+
+networks:
+  bubble:
+    external: true
