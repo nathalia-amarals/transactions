@@ -7,9 +7,7 @@ import br.com.itau.transactions.service.messaging.sqs.SQSService;
 import com.amazonaws.util.json.Jackson;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -37,6 +35,17 @@ public class TransactionController {
             sqsService.sendMessageToOrderFinisher(Jackson.toJsonString(event));
             return ResponseEntity.created(URI.create("transaction")).body(transaction);
         }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity getAccountBalance(@RequestParam("accountNumber")String accountNumber){
+        try{
+            var balance = transactionService.getBalance(accountNumber);
+
+            return ResponseEntity.ok().body(balance);
+        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }

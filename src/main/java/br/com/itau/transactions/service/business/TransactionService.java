@@ -22,5 +22,11 @@ public class TransactionService {
     public List<Transaction> getAllTransactions(final String accountNumber){
         return transactionRepository.findByAccountNumber(accountNumber);
     }
+
+    public BigDecimal getBalance(String accountNumber){
+        return getAllTransactions(accountNumber).stream()
+                .map(Transaction::getTransactionValue)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
 }
 
